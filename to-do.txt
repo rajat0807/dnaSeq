@@ -1,0 +1,72 @@
+
+"Find Best Position within range for L value" checkbox option, and disable position
+Links to search for found positions and motifs on output page
+"Mixed: highest ranking motif/position in range ; range ; find max L"
+"Cleanup" function
+
+shadow on tooltips
+download all motif names and values as text files
+database search for known motif names
+REST interface
+fix "A\nA" text bug
+remove standard tooltips over links and images
+tooltips over links in valuesframe.html
+add newlines to wrap sequence on textarea
+change "options" link to div
+check why returned phi value is always 10
+save to load even if "motif not found" error
+friendly "motif not found" error
+textarea text wrap
+tooltips for options description
+tooltip fade on IE
+reformulate startpos and endpos variables
+css to file
+check uploaded file length >10
+define "output" parameter in ep
+fill startpos and endpos when study by motif
+
+change arguments
+
+valgrind on isabelle
+fix bitmap free memory
+
+
+graphics: m�imo em estrela
+graphics: definir drawDot
+graphics: tirar check do drawPoint
+graphics: safe & fast drawline
+graphics: escala decimal se n==1
+graphics: tentar escala de 5*10 em 5*10 no Plot
+
+3dgraphics: 3d tiles com cor progressiva
+3dgraphics: tracejado na grelha
+
+php: mostrar msg de erro amig�el quando o motivo n� existe
+php: retirar tracejado vermelho onblurr
+
+ep: substituir min(1,start) para min(l,start) e corrigir label no 3dplot
+ep: reestruturar nomes dos argumentos
+ep: tirar descri�o do output
+
+*html: nomes com minusculas
+html: msg de erro com indica�o da vari�el que falta
+html: salvar vari�el do motivo para load
+html: mudar tipo de letra
+html: verificar e validar textarea
+html: verificar valores das posi�es antes de submeter
+html: apagar sequ�cias enviadas antigas
+html: ficheiros fasta com v�ias sequ�cias
+
+f�mula: vector 1xL para f(xi) seguidos no c�culo da window
+f�mula: implementar quicksort
+f�mula: n� carregar .seq quando �study by motif
+f�mula: implementar m�odo do getcountsvector
+
+suffix tree: optimizar contagens!!!
+suffix tree: algoritmo de ukkonen
+suffix tree: estudar melhor representa�o com apontadores
+
+php:
+system("(".$cmd." >".$filename.") >/dev/null &");
+system("(".$cmd." &) > /dev/null");
+exec("$cmd > /dev/null 2>&1 &", $output);
