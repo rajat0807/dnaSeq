@@ -4,10 +4,6 @@
 #include <math.h>
 #include "sequencefile.h"
 #include "suffixtries.h"
-#include "bitmap.h"
-#include "graphics.h"
-#include "3dgraphics.h"
-#include "statistics.h"
 
 #define LIMIT 10
 
@@ -134,7 +130,7 @@ void loadDataFromFile(){
 	free(datafilename);
 }
 
-// salva a descri�o da sequ�cia para um ficheiro
+
 void saveDescriptionToFile(){
 	int n;
 	char *descfilename;
@@ -152,6 +148,8 @@ void saveDescriptionToFile(){
 	fclose(fileout);
 	free(descfilename);
 }
+
+
 void printBinary(unsigned int x){
 	int i;
 	unsigned int zero;
@@ -165,11 +163,6 @@ void printBinary(unsigned int x){
 	printf("\n");
 }
 
-// FALTA: implementar QuickSort
-// ordena as listas de pontos por p-value
-void sortPointsLists();
-
-// salva a lista de pontos num ficheiro de texto
 void savePointsToFile(int sort){
 	int i,j;
 	int *done;
@@ -207,7 +200,7 @@ void savePointsToFile(int sort){
 	fclose(fileout);
 }
 
-// devolve a substring de tamanho L que termina na posi�o i do texto
+
 char *getSubstring(int i, int l){
 	char *substring;
 	int length;
@@ -220,7 +213,7 @@ char *getSubstring(int i, int l){
 	return substring;
 }
 
-// devolve o nmero de ocorr�cias da substring (Si...Sj) na sequ�cia total
+
 int slowcount(int i, int j){
 	char *substring;
 	int length,count;
@@ -241,12 +234,10 @@ int slowcount(int i, int j){
 			if(k==(length-1)) count++;
 		}
 	}
-	//printf("'%s'(%d)\n",substring,count);
+	
 	return count;
 }
 
-// FALTA: optimizar "substring" e "getSubStringCount" com "substringscount"
-// devolve o nmero de ocorr�cias da substring (Si...Sj) na sequ�cia total usando �vores de sufixos
 int count(int i, int j){
 	//char *substring;
 	int length,count;
@@ -265,7 +256,6 @@ int count(int i, int j){
 	return count;
 }
 
-// f�mula dos perfis entr�icos
 double f(double L, double phi, int i, int N){
 	long double aux1,aux2;
 	long double k;
@@ -282,13 +272,10 @@ double f(double L, double phi, int i, int N){
 }
 
 
-// f�mula dos perfis entr�icos normalizada
 double g(int L, int phi, int i, int N){
 	return ( ( f((double)L,(double)phi,i,N) - mteta ) / steta );
 }
 
-// FALTA: ver se �preciso "long double"
-// FALTA: melhorar o "getCountByFollowInTree"
 double getSumFSquared(){
 	int i,j;
 	int pos;
@@ -336,8 +323,6 @@ double getSumFSquared(){
 
 
 
-
-// FALTA: fazer free's
 void fastCalculateMS(){
 	int i;
 	int iN=sequencesize;
@@ -403,12 +388,6 @@ void fastCalculateMS(){
 }
 
 
-/*********/
-/* INPUT */
-/*********/
-
-
-// devolve o argumento com nome key do tipo string
 char * parseStringArg(char **argslist, int argssize, char key){
 	int i;
 	for(i=0;i<argssize;i++)
@@ -417,7 +396,6 @@ char * parseStringArg(char **argslist, int argssize, char key){
 	return NULL;
 }
 
-// devolve o argumento com nome key do tipo char
 char parseCharArg(char **argslist, int argssize, char key){
 	int i;
 	for(i=0;i<argssize;i++)
@@ -426,7 +404,6 @@ char parseCharArg(char **argslist, int argssize, char key){
 	return '\0';
 }
 
-// devolve o argumento com nome key do tipo int
 int parseIntArg(char **argslist, int argssize, char key){
 	int i;
 	for(i=0;i<argssize;i++)
@@ -435,19 +412,6 @@ int parseIntArg(char **argslist, int argssize, char key){
 	return 0;
 }
 
-// FALTA: argumento gr�icos a desenhar
-// FALTA: fazer free das vari�eis
-// FALTA: fazer a valida�o e substitui�o de todas as letras da sequ�cia
-// FALTA: command line arguments do tipo "ep -x1 -y2 -z3 ..."
-// FALTA: fazer verifica�es dos argumentos
-// FALTA: garantir que n� h�espa�s nem outros caracteres estranhos no texto enviado
-// FALTA: garantir que as vari�eis nmericas t� valores num�icos
-// FALTA: retirar espa�s da descri�o do ficheiro
-// FALTA: verificar limites da substring devolvida
-
-// INPUT: entropicprofiles 1<tipo da sequ�cia> 2<texto ou nome do ficheiro> 3<L m�> 4<phi m�> 5<i> 6<find m�?> 7<pos window>
-// OUTPUT: 1<L> 2<Phi> 3<i> 4<tamanho da sequ�cia> 5<limite> 6<nmero de passos> 7<nmero de n�> 8<nmero de bytes>
-// OUTPUT: 9<subseq. de comprimento L na posi�o i> 10<texto ou descri�o da seq. no ficheiro>
 int main(int argc, char *argv[]){
 
 	int n,steps,limit,nbytes,nnodes,findmax;
@@ -461,7 +425,7 @@ int main(int argc, char *argv[]){
 	
 	printf("Filename: '%s'\n",filename);
 	
-	sequencefromfile=loadSequences(filename);
+	sequencefromfile=loadSequence(filename);
 	if(sequencefromfile==NULL) exitError("Invalid sequence file name.");
 	
 
@@ -471,20 +435,21 @@ int main(int argc, char *argv[]){
 
 
 
-	for(int i=0; i<30; i++) {
 
-		sequencetext=sequencefromfile[i].data;
-		sequencesize=sequencefromfile[i].size;
-		description=sequencefromfile[i].description;
+	// for(int i=0; i<10; i++) {
+
+		sequencetext=sequencefromfile->data;
+		sequencesize=sequencefromfile->size;
+		description=sequencefromfile->description;
 
 
 		// lvalue=parseIntArg(argv,argc,'l');
 		// if(sequencesize<lvalue) exitError("Sequence size too small.");
 		//phivalue=parseIntArg(argv,argc,'p');
 
-		lvalue = 7;
+		lvalue = 8;
 		phivalue=10;
-		position=7;
+		position=8;
 		positionwindow = sequencesize;
 		
 		//if(positionwindow<1) positionwindow=1;
@@ -492,27 +457,14 @@ int main(int argc, char *argv[]){
 		//if( ((position-positionwindow/2)<1) || ((position+positionwindow/2)>sequencesize) ) positionwindow=2*intmin(position,sequencesize-position);
 
 		n=(int)strlen(filename);
-		treefilename=(char *)malloc((n+7)*sizeof(char));
-		strcpy(treefilename,filename);
-		strcat(treefilename,".tree");
 
 		steps=0;
 		limit=LIMIT;
-		loadedfromfile=parseIntArg(argv,argc,'x');
-		if(loadedfromfile==0){
-			suffixtree=buildTree(sequencetext,limit,&steps);
-			saveTreeToFile(treefilename);
-			saveDescriptionToFile();
-			fastCalculateMS();
-			saveDataToFile();
-		} else {
-			//printf("Loading: '%s'\n",treefilename);
-			if(loadTreeFromFile(treefilename)==0) exitError("Tree file not found.");						//watch this
-			suffixtree=getSuffixTreeRoot();
-			setTreeText(sequencetext);
-			loadDataFromFile();
-		}
-
+		
+		
+		suffixtree=buildTree(sequencetext,limit,&steps);
+		fastCalculateMS();
+		saveDataToFile();
 		
 		fprintf(fileout, "M=%f\nS=%f\n\n",mteta,steta);
 		double maxDou = 0.0;
@@ -525,18 +477,18 @@ int main(int argc, char *argv[]){
 		}
 
 
-		fprintf(fileout, "\n\nMax: %f\n", maxDou);
-	}
+		fprintf(fileout, "\nMax: %f\n\n\n", maxDou);
+		fprintf(fileout, "\t\t\t\t\t\t\t\t\t\t\t-------------------------------------------------------------\n");
+	// }
 
 	fclose(fileout);
 	if(sequencefromfile!=NULL) freeSequence(sequencefromfile);
 	freeTreeNode(suffixtree);
 	freeVariables();
 
-	free(treefilename);
+	
 	free(subsequence);
 	freeAlphabet();
 
-	//system("pause");
 	return 1;
 }
