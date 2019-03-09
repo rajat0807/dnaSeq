@@ -1,0 +1,2 @@
+>PYAM01000025.1 dna:primary_assembly primary_assembly:Nemo_v1:PYAM01000025.1:1:2645011:1 REF
+ATAATAA

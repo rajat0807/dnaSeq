@@ -6,6 +6,7 @@
 #include "suffixtries.h"
 
 #define LIMIT 10
+#define SIZE 50
 
 static char type = '\0';
 static char *filename = NULL;
@@ -36,7 +37,10 @@ static char **substringslist = NULL;
 static double *averageslist = NULL;
 static double *varianceslist = NULL;
 
-
+struct EPVal {
+    double val;
+    int ind;
+} a[SIZE+4];
 // converte um double para um int
 int d2i(double n){
 	return (int)floor(n);
@@ -58,6 +62,24 @@ int intmin(int x, int y){
 	if(x<y) return x;
 	return y;
 }
+
+char* substr(const char *src, int m, int n)
+{
+	int len = n - m;
+
+	char *dest = (char*)malloc(sizeof(char) * (len + 1));
+
+	for (int i = m; i < n && (*src != '\0'); i++)
+	{
+		*dest = *(src + i);
+		dest++;
+	}
+
+	*dest = '\0';
+
+	return dest - len;
+}
+
 
 // devolve uma mensagem de erro e sai do programa
 void exitError(char *errordesc){
@@ -412,6 +434,23 @@ int parseIntArg(char **argslist, int argssize, char key){
 	return 0;
 }
 
+static int compareIt (const void * a, const void * b)
+{
+	struct EPVal *ia = (struct EPVal *)a;
+	struct EPVal *ib = (struct EPVal *)b;
+
+  if (ia->val > ib->val) return -1;
+  else if (ia->val < ib->val) return 1;
+  else return 0;  
+}
+
+int checkSubstring(char *text, int i1, int i2) {
+	char *str1 = substr(text, i1 - lvalue + 1, i1 + 1);
+	char *str2 = substr(text, i2 - lvalue + 1, i2 + 1);
+	int cmp = ( strcmp(str1, str2) == 0 );
+	return cmp;
+}
+
 int main(int argc, char *argv[]){
 
 	int n,steps,limit,nbytes,nnodes,findmax;
@@ -425,12 +464,15 @@ int main(int argc, char *argv[]){
 	
 	printf("Filename: '%s'\n",filename);
 	
+	printf("Loading the sequencefromfile...\n");
+
 	sequencefromfile=loadSequence(filename);
 	if(sequencefromfile==NULL) exitError("Invalid sequence file name.");
 	
+	printf("Load complete. \n");
 
 	FILE *fileout;
-	fileout=fopen("output.txt","w");
+	fileout=fopen( strcat ( substr(filename, 0, strlen(filename)-3) , "_output.txt"),"w");
 	if(fileout==NULL) return -1;
 
 
@@ -447,9 +489,9 @@ int main(int argc, char *argv[]){
 		// if(sequencesize<lvalue) exitError("Sequence size too small.");
 		//phivalue=parseIntArg(argv,argc,'p');
 
-		lvalue = 8;
+		lvalue = 7;
 		phivalue=10;
-		position=8;
+		position=7;
 		positionwindow = sequencesize;
 		
 		//if(positionwindow<1) positionwindow=1;
@@ -461,24 +503,76 @@ int main(int argc, char *argv[]){
 		steps=0;
 		limit=LIMIT;
 		
-		
 		suffixtree=buildTree(sequencetext,limit,&steps);
+
 		fastCalculateMS();
 		saveDataToFile();
 		
 		fprintf(fileout, "M=%f\nS=%f\n\n",mteta,steta);
+		
+		// size_t len = (sequencesize+1)*sizeof(double);
 		double maxDou = 0.0;
-		ypointslist=(double *)malloc((sequencesize+1)*sizeof(double));
+		// ypointslist=(double *)malloc(len);
 
+	
 		for(int j=1; j<sequencesize+1; j++) {
-			ypointslist[j] = g(lvalue,phivalue,j,sequencesize);
-			maxDou = doublemax(maxDou, ypointslist[j]);
-			fprintf(fileout, "%d : %f\n",j,ypointslist[j]);
+			double tt = g(lvalue,phivalue,j,sequencesize);
+			
+			if(j<=SIZE) {
+				a[j-1].val = tt;
+				a[j-1].ind = j;
+			} else if( j > SIZE ) {
+				double d = tt;
+
+				int ii;
+
+				if(d < a[SIZE-1].val) {
+					continue;
+				}
+
+
+				int breakIt=0;
+				for(ii=0; ii<SIZE; ii++) {
+					if(a[ii].val == d) {
+						if( checkSubstring(sequencetext, a[ii].ind, j) == 1 ) {
+							breakIt = 1;
+						}
+					} else if(a[ii].val < d) {
+						break;
+					}
+				}
+
+				if(breakIt) {
+					continue;
+				}
+				
+				if(ii!=SIZE) {
+					for(int i=SIZE-1; i>ii; i--) {
+						a[i].val = a[i-1].val;
+						a[i].ind = a[i-1].ind;
+					}
+
+					a[ii].val = d;
+					a[ii].ind = j;
+				}
+			}
+
+			if(j==SIZE) {
+				qsort (a, SIZE, sizeof(struct EPVal), compareIt);
+
+				for(int i = 0; i<SIZE; i++) {
+					printf("%lf , %d\n", a[i].val, a[i].ind);
+				}
+				printf("\n");
+			}
+			
 		}
 
+		for(int i = 0; i<SIZE; i++) {
+			fprintf(fileout, "%s\t%lf\n", substr(sequencetext, a[i].ind - lvalue + 1, a[i].ind + 1), a[i].val);
+		}
+		printf("\n");
 
-		fprintf(fileout, "\nMax: %f\n\n\n", maxDou);
-		fprintf(fileout, "\t\t\t\t\t\t\t\t\t\t\t-------------------------------------------------------------\n");
 	// }
 
 	fclose(fileout);
